@@ -60,13 +60,23 @@
             <artifactId>hibernate-validator</artifactId>
             <version>6.0.20.Final</version>
         </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
+        <finalName>url-shortt</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>com.heroku.sdk</groupId>
+                <artifactId>heroku-maven-plugin</artifactId>
+                <version>3.0.3</version>
             </plugin>
         </plugins>
     </build>
