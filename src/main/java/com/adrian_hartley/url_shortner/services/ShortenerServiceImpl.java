@@ -26,16 +26,27 @@ public class ShortenerServiceImpl implements ShortenerService {
         return shortenerRepo.existsByAlias(alias);
     }
 
+    /**
+     * Creates a new shortened link
+     * @param redirectCreation The object sent in the post, contains an alias and a url
+     * @return The newly made link
+     */
+
     @Override
     public Optional<Shortener> createRedirect(RedirectCreation redirectCreation) {
+        System.out.println("URL: " + redirectCreation.getUrl() + " Alias: " + redirectCreation.getAlias());
         if(shortenerRepo.existsByAlias(redirectCreation.getAlias())) {
             throw new ResourceFoundException("Alias Already Exists.");
         }
-        return Optional.empty();
+        Shortener shortener = shortenerRepo.save(new Shortener(redirectCreation.getAlias(), redirectCreation.getUrl()));
+        return Optional.of(shortener);
     }
 
     @Override
-    public Optional<Shortener> getRedirect(RedirectCreation redirectCreation) {
-        return Optional.empty();
+    public Optional<Shortener> getRedirect(String alias) {
+        Shortener shortener = shortenerRepo.findByAlias(alias)
+                .orElseThrow(() -> new ResourceNotFoundException("Alias Does Not Exist."));
+
+        return Optional.of(shortener);
     }
 }

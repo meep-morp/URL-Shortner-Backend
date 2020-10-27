@@ -1,5 +1,6 @@
 package com.adrian_hartley.url_shortner.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.NaturalId;
 import org.hibernate.validator.constraints.URL;
 
@@ -12,6 +13,7 @@ import javax.persistence.Id;
 public class Shortener {
     @Id
     @GeneratedValue
+    @JsonIgnore
     private long id;
 
     @NaturalId
