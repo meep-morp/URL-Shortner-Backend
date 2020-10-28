@@ -11,4 +11,7 @@ public interface ShortenerService {
     Boolean existsByAlias(String alias);
     Optional<Shortener> createRedirect(RedirectCreation redirectCreation);
     Optional<Shortener> getRedirect(String alias);
+    Shortener save(Shortener shortener);
+    Shortener update(Shortener shortener);
+    Shortener getMetrics(String alias);
 }

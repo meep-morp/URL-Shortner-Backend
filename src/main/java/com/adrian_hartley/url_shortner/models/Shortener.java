@@ -21,8 +21,10 @@ public class Shortener {
     private String alias;
 
     @Column(nullable = false)
-    @URL
+    @URL(message = "Not a valid URL")
     private String url;
+
+    private long clicks = 0;
 
     public Shortener(String alias, String url) {
         this.alias = alias;
@@ -30,6 +32,14 @@ public class Shortener {
     }
 
     public Shortener() {
+    }
+
+    public long getClicks() {
+        return clicks;
+    }
+
+    public void setClicks(long clicks) {
+        this.clicks = clicks;
     }
 
     public long getId() {

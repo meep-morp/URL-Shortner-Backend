@@ -7,6 +7,7 @@ import com.adrian_hartley.url_shortner.repositories.ShortenerRepo;
 import com.adrian_hartley.url_shortner.requests.RedirectCreation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -48,5 +49,35 @@ public class ShortenerServiceImpl implements ShortenerService {
                 .orElseThrow(() -> new ResourceNotFoundException("Alias Does Not Exist."));
 
         return Optional.of(shortener);
+    }
+
+    @Transactional
+    @Override
+    public Shortener save(Shortener shortener) {
+        return shortenerRepo.save(shortener);
+    }
+
+    @Override
+    @Transactional
+    public Shortener update(Shortener shortener) {
+        Shortener currentShortener = shortenerRepo.findById(shortener.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Alias Does Not Exist."));
+
+        if(shortener.getUrl() != null) {
+            currentShortener.setUrl(shortener.getUrl());
+        }
+        if(shortener.getAlias() != null) {
+            currentShortener.setAlias(shortener.getAlias());
+        }
+
+        currentShortener.setClicks(shortener.getClicks() + 1);
+
+        return shortenerRepo.save(currentShortener);
+    }
+
+    @Override
+    public Shortener getMetrics(String alias) {
+        return shortenerRepo.findByAlias(alias)
+                .orElseThrow(() -> new ResourceNotFoundException("Alias Does Not Exist."));
     }
 }

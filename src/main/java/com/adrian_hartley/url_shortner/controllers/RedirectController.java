@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -27,9 +28,12 @@ public class RedirectController {
      * @return 301 Moved Permanently -- Redirects to desired URL
      */
     @GetMapping("/{alias}")
+    @Transactional
     public ResponseEntity<?> handleRedirect(@PathVariable String alias) throws URISyntaxException {
         Shortener shortener = shortenerService.getRedirect(alias)
                 .orElseThrow(() -> new ResourceNotFoundException("Alias Does Not Exist."));
+
+        shortenerService.update(shortener);
 
         URI uri = new URI(shortener.getUrl());
         HttpHeaders httpHeaders = new HttpHeaders();
@@ -38,9 +42,23 @@ public class RedirectController {
     }
 
     /**
+     * Get the metrics of a specified link
+     * @param alias the ID of the URL
+     * @return 200 OK -- The link with it's metrics
+     */
+    @GetMapping("/metrics/{alias}")
+    @Transactional
+    public ResponseEntity<?> getMetrics(@PathVariable String alias) {
+        Shortener shortener = shortenerService.getMetrics(alias);
+
+        return new ResponseEntity<>(shortener, HttpStatus.OK);
+    }
+
+    /**
      * Create a new shortened url
      * @return JSON object containing the shortened URL
      */
+    @Transactional
     @PostMapping("/")
     public ResponseEntity<?> createRedirect(@Valid @RequestBody RedirectCreation redirectCreation) throws URISyntaxException {
         Shortener shortener = shortenerService.createRedirect(redirectCreation)
