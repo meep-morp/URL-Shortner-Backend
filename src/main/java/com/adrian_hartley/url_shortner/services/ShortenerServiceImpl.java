@@ -2,9 +2,7 @@ package com.adrian_hartley.url_shortner.services;
 
 import com.adrian_hartley.url_shortner.exceptions.ResourceFoundException;
 import com.adrian_hartley.url_shortner.exceptions.ResourceNotFoundException;
-import com.adrian_hartley.url_shortner.models.Metric;
 import com.adrian_hartley.url_shortner.models.Shortener;
-import com.adrian_hartley.url_shortner.models.ShortenerMetric;
 import com.adrian_hartley.url_shortner.repositories.MetricRepo;
 import com.adrian_hartley.url_shortner.repositories.ShortenerRepo;
 import com.adrian_hartley.url_shortner.requests.RedirectCreation;

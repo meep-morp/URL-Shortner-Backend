@@ -1,6 +1,5 @@
 package com.adrian_hartley.url_shortner.services;
 
-import com.adrian_hartley.url_shortner.models.Metric;
 import com.adrian_hartley.url_shortner.repositories.MetricRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
