@@ -1,20 +1,21 @@
 package com.adrian_hartley.url_shortner.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.NaturalId;
 import org.hibernate.validator.constraints.URL;
 
 import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Entity
+@Table(name = "shortener")
 public class Shortener {
     @Id
     @GeneratedValue
     @JsonIgnore
-    private long id;
+    private long shortid;
 
     @NaturalId
     @Column(unique = true, nullable = false)
@@ -26,11 +27,9 @@ public class Shortener {
 
     private long clicks = 0;
 
-    @ElementCollection
-    private List<String> dates = new ArrayList<>();
-
-    @ElementCollection
-    private List<String> ipaddresses = new ArrayList<>();
+    @OneToMany(mappedBy = "shortener", cascade = CascadeType.ALL)
+    @JsonIgnoreProperties(value = "shortener", allowSetters = true)
+    private List<ShortenerMetric> metrics = new ArrayList<>();
 
     public Shortener(String alias, String url) {
         this.alias = alias;
@@ -40,20 +39,16 @@ public class Shortener {
     public Shortener() {
     }
 
-    public List<String> getDates() {
-        return dates;
+    public void setShortid(long id) {
+        this.shortid = id;
     }
 
-    public void setDates(List<String> dates) {
-        this.dates = dates;
+    public List<ShortenerMetric> getMetrics() {
+        return metrics;
     }
 
-    public List<String> getIpaddresses() {
-        return ipaddresses;
-    }
-
-    public void setIpaddresses(List<String> ipaddresses) {
-        this.ipaddresses = ipaddresses;
+    public void setMetrics(List<ShortenerMetric> shortenerMetrics) {
+        this.metrics = shortenerMetrics;
     }
 
     public long getClicks() {
@@ -64,12 +59,8 @@ public class Shortener {
         this.clicks = clicks;
     }
 
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
+    public long getShortid() {
+        return shortid;
     }
 
     public String getAlias() {

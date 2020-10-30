@@ -2,7 +2,10 @@ package com.adrian_hartley.url_shortner.services;
 
 import com.adrian_hartley.url_shortner.exceptions.ResourceFoundException;
 import com.adrian_hartley.url_shortner.exceptions.ResourceNotFoundException;
+import com.adrian_hartley.url_shortner.models.Metric;
 import com.adrian_hartley.url_shortner.models.Shortener;
+import com.adrian_hartley.url_shortner.models.ShortenerMetric;
+import com.adrian_hartley.url_shortner.repositories.MetricRepo;
 import com.adrian_hartley.url_shortner.repositories.ShortenerRepo;
 import com.adrian_hartley.url_shortner.requests.RedirectCreation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +21,12 @@ import java.util.Optional;
 public class ShortenerServiceImpl implements ShortenerService {
     @Autowired
     ShortenerRepo shortenerRepo;
+
+    @Autowired
+    MetricRepo metricRepo;
+
+    @Autowired
+    ShortenerService shortenerService;
 
     @Override
     public Shortener findByAlias(String alias) {
@@ -57,32 +66,60 @@ public class ShortenerServiceImpl implements ShortenerService {
     @Transactional
     @Override
     public Shortener save(Shortener shortener) {
+        Shortener newShortener = new Shortener();
+        newShortener.setShortid(shortener.getShortid());
+
+        newShortener.setClicks(shortener.getClicks());
+        newShortener.setAlias(shortener.getAlias());
+        newShortener.setUrl(shortener.getUrl());
+
+        newShortener.getMetrics().clear();
+        for(ShortenerMetric s : shortener.getMetrics()) {
+            Metric metric = metricRepo.findById(s.getMetric().getMetricid())
+                    .orElseThrow(() -> new ResourceNotFoundException("Metric Not Found"));
+            newShortener.getMetrics().add(new ShortenerMetric(newShortener, metric));
+        }
+
         return shortenerRepo.save(shortener);
     }
 
     @Override
     @Transactional
     public Shortener update(Shortener shortener, String ip) {
+
+        Shortener currentShortener = shortenerRepo.findById(shortener.getShortid())
+                .orElseThrow(() -> new ResourceNotFoundException("Alias Does Not Exist."));
+
         Date date = new Date();
         DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
         String convertedDate = dateFormat.format(date);
 
-        Shortener currentShortener = shortenerRepo.findById(shortener.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Alias Does Not Exist."));
+        Metric metric = new Metric(convertedDate, ip);
+        metricRepo.save(metric);
 
         if(shortener.getUrl() != null) {
             currentShortener.setUrl(shortener.getUrl());
         }
+
         if(shortener.getAlias() != null) {
             currentShortener.setAlias(shortener.getAlias());
         }
 
         currentShortener.setClicks(shortener.getClicks() + 1);
-        currentShortener.getDates().add(convertedDate);
 
-        currentShortener.getIpaddresses().add(ip);
+        for (ShortenerMetric s : shortener.getMetrics()) {
+            currentShortener.getMetrics().add(s);
+        }
 
-        return shortenerRepo.save(currentShortener);
+        System.out.println(currentShortener.getShortid());
+
+        currentShortener.getMetrics().add(new ShortenerMetric(currentShortener, metric));
+
+        for(ShortenerMetric m : currentShortener.getMetrics()) {
+            System.out.println("Date " + m.getMetric().getDate());
+        }
+
+        return shortenerService.save(currentShortener);
     }
 
     @Override
