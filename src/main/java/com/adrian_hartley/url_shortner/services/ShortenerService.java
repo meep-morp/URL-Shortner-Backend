@@ -12,6 +12,6 @@ public interface ShortenerService {
     Optional<Shortener> createRedirect(RedirectCreation redirectCreation);
     Optional<Shortener> getRedirect(String alias);
     Shortener save(Shortener shortener);
-    Shortener update(Shortener shortener);
+    Shortener update(Shortener shortener, String ip);
     Shortener getMetrics(String alias);
 }

@@ -9,6 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Optional;
 
 @Service("shortenerService")
@@ -59,7 +62,11 @@ public class ShortenerServiceImpl implements ShortenerService {
 
     @Override
     @Transactional
-    public Shortener update(Shortener shortener) {
+    public Shortener update(Shortener shortener, String ip) {
+        Date date = new Date();
+        DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        String convertedDate = dateFormat.format(date);
+
         Shortener currentShortener = shortenerRepo.findById(shortener.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Alias Does Not Exist."));
 
@@ -71,6 +78,9 @@ public class ShortenerServiceImpl implements ShortenerService {
         }
 
         currentShortener.setClicks(shortener.getClicks() + 1);
+        currentShortener.getDates().add(convertedDate);
+
+        currentShortener.getIpaddresses().add(ip);
 
         return shortenerRepo.save(currentShortener);
     }

@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -29,11 +30,13 @@ public class RedirectController {
      */
     @GetMapping("/{alias}")
     @Transactional
-    public ResponseEntity<?> handleRedirect(@PathVariable String alias) throws URISyntaxException {
+    public ResponseEntity<?> handleRedirect(@PathVariable String alias, HttpServletRequest request) throws URISyntaxException {
         Shortener shortener = shortenerService.getRedirect(alias)
                 .orElseThrow(() -> new ResourceNotFoundException("Alias Does Not Exist."));
 
-        shortenerService.update(shortener);
+        System.out.println(request.getRemoteAddr());
+
+        shortenerService.update(shortener, request.getRemoteAddr());
 
         URI uri = new URI(shortener.getUrl());
         HttpHeaders httpHeaders = new HttpHeaders();
